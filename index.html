@@ -1,35 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Converter App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="style.css">
+<title>File Converter & Compressor</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffffff">
 </head>
+
 <body>
 
-    <div class="container">
-        <h1>File Converter</h1>
+<div class="container">
 
-        <input type="file" id="imageInput" accept="image/*">
+<h1>File Converter</h1>
 
-        <select id="formatSelect">
-            <option value="png">PNG</option>
-            <option value="jpeg">JPG</option>
-            <option value="webp">WEBP</option>
-        </select>
+<div id="dropZone">
+    Drag & Drop Image Here
+    <br>
+    OR
+    <br><br>
+    <input type="file" id="imageInput" accept="image/*">
+</div>
 
-        <button id="convertBtn">
-            Convert
-        </button>
+<select id="formatSelect">
+    <option value="jpeg">JPG</option>
+    <option value="png">PNG</option>
+    <option value="webp">WEBP</option>
+</select>
 
-        <a id="downloadLink" style="display:none;">
-            Download File
-        </a>
-    </div>
+<input
+type="number"
+id="targetSize"
+placeholder="Target Size">
 
-    <script src="script.js"></script>
+<select id="sizeUnit">
+    <option value="KB">KB</option>
+    <option value="MB">MB</option>
+</select>
+
+<button id="convertBtn">
+Convert & Compress
+</button>
+
+<div class="progressContainer">
+    <div id="progressBar"></div>
+</div>
+
+<p id="status"></p>
+
+<a id="downloadLink" style="display:none">
+Download File
+</a>
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
 </html>
