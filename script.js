@@ -1,57 +1,109 @@
 const imageInput = document.getElementById("imageInput");
 const formatSelect = document.getElementById("formatSelect");
+const targetSizeInput = document.getElementById("targetSize");
+const sizeUnit = document.getElementById("sizeUnit");
 const convertBtn = document.getElementById("convertBtn");
+const progressBar = document.getElementById("progressBar");
 const downloadLink = document.getElementById("downloadLink");
+const statusText = document.getElementById("status");
+const dropZone = document.getElementById("dropZone");
 
-convertBtn.addEventListener("click", () => {
+let selectedFile = null;
 
-    const file = imageInput.files[0];
+imageInput.addEventListener("change", e => {
+    selectedFile = e.target.files[0];
+});
 
-    if (!file) {
-        alert("Please select an image.");
+dropZone.addEventListener("dragover", e => {
+    e.preventDefault();
+});
+
+dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    selectedFile = e.dataTransfer.files[0];
+});
+
+convertBtn.addEventListener("click", async () => {
+
+    if(!selectedFile){
+        alert("Select a file");
         return;
     }
 
-    const reader = new FileReader();
+    progressBar.style.width="10%";
+    statusText.innerText="Reading file...";
 
-    reader.onload = function(e) {
+    const img = new Image();
 
-        const img = new Image();
+    img.src = URL.createObjectURL(selectedFile);
 
-        img.onload = function() {
+    img.onload = () => {
 
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
+        progressBar.style.width="40%";
 
-            canvas.width = img.width;
-            canvas.height = img.height;
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
 
-            ctx.drawImage(img, 0, 0);
+        canvas.width = img.width;
+        canvas.height = img.height;
 
-            const format = formatSelect.value;
+        ctx.drawImage(img,0,0);
 
-            let mimeType = "image/png";
+        const format = formatSelect.value;
 
-            if (format === "jpeg") {
-                mimeType = "image/jpeg";
+        let mime="image/jpeg";
+
+        if(format==="png")
+            mime="image/png";
+
+        if(format==="webp")
+            mime="image/webp";
+
+        let quality=0.9;
+
+        const target =
+        Number(targetSizeInput.value);
+
+        const unit=sizeUnit.value;
+
+        let targetBytes =
+        unit==="MB"
+        ? target*1024*1024
+        : target*1024;
+
+        function compress(){
+
+            let data=
+            canvas.toDataURL(mime,quality);
+
+            let bytes=
+            Math.round((data.length*3)/4);
+
+            if(bytes>targetBytes && quality>0.1){
+
+                quality-=0.05;
+
+                compress();
+
+            }else{
+
+                progressBar.style.width="100%";
+
+                statusText.innerText=
+                `Approx Size: ${(bytes/1024).toFixed(1)} KB`;
+
+                downloadLink.href=data;
+                downloadLink.download=
+                `converted.${format}`;
+
+                downloadLink.style.display="block";
             }
+        }
 
-            if (format === "webp") {
-                mimeType = "image/webp";
-            }
-
-            const convertedImage =
-                canvas.toDataURL(mimeType, 0.9);
-
-            downloadLink.href = convertedImage;
-            downloadLink.download =
-                "converted." + format;
-
-            downloadLink.style.display = "block";
-        };
-
-        img.src = e.target.result;
+        compress();
     };
-
-    reader.readAsDataURL(file);
 });
+
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js");
+}
