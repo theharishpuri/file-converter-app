@@ -157,3 +157,33 @@ button:hover{
         font-size:28px;
     }
 }
+.circle{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(40px);
+    z-index:-1;
+}
+
+.c1{
+    width:200px;
+    height:200px;
+    top:10%;
+    left:10%;
+    background:rgba(255,255,255,0.3);
+}
+
+.c2{
+    width:250px;
+    height:250px;
+    bottom:10%;
+    right:10%;
+    background:rgba(255,255,255,0.2);
+}
+
+.c3{
+    width:150px;
+    height:150px;
+    top:50%;
+    left:60%;
+    background:rgba(255,255,255,0.25);
+}
