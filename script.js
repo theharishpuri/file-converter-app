@@ -25,13 +25,13 @@ dropZone.addEventListener("drop", e => {
 
 convertBtn.addEventListener("click", async () => {
 
-    if(!selectedFile){
+    if (!selectedFile) {
         alert("Select a file");
         return;
     }
 
-    progressBar.style.width="10%";
-    statusText.innerText="Reading file...";
+    progressBar.style.width = "10%";
+    statusText.innerText = "Reading file...";
 
     const img = new Image();
 
@@ -39,7 +39,7 @@ convertBtn.addEventListener("click", async () => {
 
     img.onload = () => {
 
-        progressBar.style.width="40%";
+        progressBar.style.width = "40%";
 
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -47,56 +47,99 @@ convertBtn.addEventListener("click", async () => {
         canvas.width = img.width;
         canvas.height = img.height;
 
-        ctx.drawImage(img,0,0);
+        ctx.drawImage(img, 0, 0);
 
         const format = formatSelect.value;
 
-        let mime="image/jpeg";
+        // PDF Conversion
+        if (format === "pdf") {
 
-        if(format==="png")
-            mime="image/png";
+            progressBar.style.width = "70%";
+            statusText.innerText = "Creating PDF...";
 
-        if(format==="webp")
-            mime="image/webp";
+            const { jsPDF } = window.jspdf;
 
-        let quality=0.9;
+            const pdf = new jsPDF();
+
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight =
+                (img.height * pdfWidth) / img.width;
+
+            pdf.addImage(
+                canvas.toDataURL("image/jpeg", 1.0),
+                "JPEG",
+                0,
+                0,
+                pdfWidth,
+                pdfHeight
+            );
+
+            pdf.save("converted.pdf");
+
+            progressBar.style.width = "100%";
+            statusText.innerText =
+                "PDF created successfully!";
+
+            return;
+        }
+
+        let mime = "image/jpeg";
+
+        if (format === "png")
+            mime = "image/png";
+
+        if (format === "webp")
+            mime = "image/webp";
+
+        let quality = 0.9;
 
         const target =
-        Number(targetSizeInput.value);
+            Number(targetSizeInput.value);
 
-        const unit=sizeUnit.value;
+        const unit = sizeUnit.value;
 
         let targetBytes =
-        unit==="MB"
-        ? target*1024*1024
-        : target*1024;
+            unit === "MB"
+                ? target * 1024 * 1024
+                : target * 1024;
 
-        function compress(){
+        function compress() {
 
-            let data=
-            canvas.toDataURL(mime,quality);
+            let data =
+                canvas.toDataURL(
+                    mime,
+                    quality
+                );
 
-            let bytes=
-            Math.round((data.length*3)/4);
+            let bytes =
+                Math.round(
+                    (data.length * 3) / 4
+                );
 
-            if(bytes>targetBytes && quality>0.1){
+            if (
+                target > 0 &&
+                bytes > targetBytes &&
+                quality > 0.1
+            ) {
 
-                quality-=0.05;
+                quality -= 0.05;
 
                 compress();
 
-            }else{
+            } else {
 
-                progressBar.style.width="100%";
+                progressBar.style.width = "100%";
 
-                statusText.innerText=
-                `Approx Size: ${(bytes/1024).toFixed(1)} KB`;
+                statusText.innerText =
+                    `Approx Size: ${(bytes / 1024).toFixed(1)} KB`;
 
-                downloadLink.href=data;
-                downloadLink.download=
-                `converted.${format}`;
+                downloadLink.href = data;
 
-                downloadLink.style.display="block";
+                downloadLink.download =
+                    `converted.${format}`;
+
+                downloadLink.style.display =
+                    "block";
             }
         }
 
@@ -104,6 +147,7 @@ convertBtn.addEventListener("click", async () => {
     };
 });
 
-if("serviceWorker" in navigator){
-navigator.serviceWorker.register("sw.js");
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+}
 }
