@@ -9,7 +9,15 @@ body{
     background:#f4f6f9;
     padding:20px;
 }
+.logo{
+    text-align:center;
+    margin-bottom:20px;
+}
 
+.logo p{
+    color:gray;
+    font-size:14px;
+}
 .container{
     max-width:500px;
     margin:auto;
